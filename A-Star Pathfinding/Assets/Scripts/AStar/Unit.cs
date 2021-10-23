@@ -6,7 +6,9 @@ public class Unit : MonoBehaviour
 {
     const float minPathUpdateTime = .2f;
     const float pathUpdateMoveThreshold = .5f;
-     
+
+    public string targetNameForSpawnables;
+
     public Transform target;
 
     public float speed = 5;
@@ -18,6 +20,11 @@ public class Unit : MonoBehaviour
 
     private void Start()
     {
+        if (target == null)
+        {
+            target = GameObject.Find(targetNameForSpawnables).transform;
+        }
+
         StartCoroutine(UpdatePath());
     }
 
