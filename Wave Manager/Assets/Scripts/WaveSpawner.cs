@@ -11,25 +11,30 @@ public class WaveSpawner : MonoBehaviour
     public class Wave
     {
         public int ammountOfEnemys;
-        public int ammountOfEnemys2;
-        public int ammountOfEnemys3;
+        //Remove quotes depending on ammount of enemy's
+        //public int ammountOfEnemys2;
+        //public int ammountOfEnemys3;
 
         public float spawnRate;
 
         public string waveName;
 
         public Transform enemy1;
-        public Transform enemy2;
-        public Transform enemy3;
+        //Remove quotes depending on ammount of enemy's
+        //public Transform enemy2;
+        //public Transform enemy3;
     }
-
-    public Transform bMEnemy1;
-    public Transform bMEnemy2;
-    public Transform bMEnemy3;
+    
+    //Remove quote if you want random event enemy's
+    /*
+    public Transform rEEnemy1;
+    public Transform rEEnemy2;
+    public Transform rEEnemy3;
 
     public Transform nEnemy1;
     public Transform nEnemy2;
     public Transform nEnemy3;
+    */
 
     public Wave[] waves;
     private int waveIndex = 0;
@@ -42,9 +47,12 @@ public class WaveSpawner : MonoBehaviour
     private float searchCountdown = 1f;
 
     private SpawnState state = SpawnState.Counting;
-
-    private int bloodMoonValue;
-    public int bloodMoonPercentage;
+    
+    //Remove quote if you want random enemy events
+    /*
+    private int randomEventValue;
+    public int randomEventPercentage;
+    */
 
     // Start is called before the first frame update
     void Start()
@@ -90,6 +98,8 @@ public class WaveSpawner : MonoBehaviour
         if (searchCountdown <= 0f)
         {
             searchCountdown = 1f;
+            
+            //Change "Enemy" if you want to use something different than enemy's
             if(GameObject.FindGameObjectsWithTag("Enemy").Length == 0)
             {
                 return false;
@@ -103,27 +113,31 @@ public class WaveSpawner : MonoBehaviour
     {
         Debug.Log("Spawning Wave: " + wave.waveName);
         state = SpawnState.Spawning;
-
-        if (bloodMoonValue == 2)
+        
+        //Remove quote if you want random event
+        /*
+        if (randomEventValue == 2)
         {
-            wave.enemy1 = bMEnemy1;
-            wave.enemy2 = bMEnemy2;
-            wave.enemy3 = bMEnemy3;
+            wave.enemy1 = rEEnemy1;
+            wave.enemy2 = rEEnemy2;
+            wave.enemy3 = rEEnemy3;
         }
-        else if (bloodMoonValue != 2)
+        else if (randomEventValue != 2)
         {
             wave.enemy1 = nEnemy1;
             wave.enemy2 = nEnemy2;
             wave.enemy3 = nEnemy3;
         }
+        */
 
         for (int i = 0; i < wave.ammountOfEnemys; i++)
         {
             SpawnEnemy(wave.enemy1);
             yield return new WaitForSeconds(1f / wave.spawnRate);
         }
-
-        for(int x = 0; x < wave.ammountOfEnemys2; x++)
+        
+        //Remove quote if you want more than 1 enemy
+        /*for(int x = 0; x < wave.ammountOfEnemys2; x++)
         {
             SpawnEnemy(wave.enemy2);
             yield return new WaitForSeconds(1f / wave.spawnRate);
@@ -133,7 +147,7 @@ public class WaveSpawner : MonoBehaviour
         {
             SpawnEnemy(wave.enemy3);
             yield return new WaitForSeconds(1f / wave.spawnRate);
-        }
+        }*/
 
         state = SpawnState.Waiting;
 
@@ -143,8 +157,9 @@ public class WaveSpawner : MonoBehaviour
     void BeginNextWave()
     {
         Debug.Log("Wave Completed");
-
-        bloodMoonValue = Random.Range(0, bloodMoonPercentage);
+        
+        //Remove quote if you want random events
+        //randomEventValue = Random.Range(0, randomEventPercentage);
 
         //Add code for increasing wave number here if needed
 
