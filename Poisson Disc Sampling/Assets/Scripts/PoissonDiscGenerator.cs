@@ -25,6 +25,7 @@ public class PoissonDiscGenerator : MonoBehaviour
         {
             Vector2 spawnPoint = points[Random.Range(0, points.Count)];
             Instantiate(objectToSpawn, spawnPoint, Quaternion.identity);
+            points.Remove(spawnPoint);
         }
     }
 
