@@ -9,3 +9,7 @@ the procedual landmass generation was made using the procedual landmass generati
 there is a full understanding of what i wrote and i can explain all the parts thats why i put it in my portfolio.
 
 the poisson disc sampling was made using this research paper made by Robert Braidson: https://www.cs.ubc.ca/~rbridson/docs/bridson-siggraph07-poissondisk.pdf
+
+the Risk of Rain 2 - Spawning and Scaling is made using these RoR2 wiki pages as reference: 
+- https://riskofrain2.fandom.com/wiki/Difficulty
+- https://riskofrain2.fandom.com/wiki/Directors
