@@ -17,13 +17,14 @@ public class Enemy : MonoBehaviour
     public float monsterValue;
     public float rewardMultiplier;
 
+    [Range(0, 10)]
     public float weight;
     public int creditCost;
 
     // Start is called before the first frame update
     void Start()
     {
-
+        scalingManager = GameObject.Find("DifficulityManager").GetComponent<DifficulityScalingManager>();
     }
 
     // Update is called once per frame

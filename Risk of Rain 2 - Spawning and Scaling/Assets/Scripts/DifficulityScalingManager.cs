@@ -15,10 +15,12 @@ public class DifficulityScalingManager : MonoBehaviour
     public float difficulityCoeff;
     public float timeInSeconds;
 
+    public SceneDirector sceneDirector;
 
     public void Start()
     {
-        
+        CalculateCoeff();
+        sceneDirector.enabled = true;
     }
 
     // Update is called once per frame
