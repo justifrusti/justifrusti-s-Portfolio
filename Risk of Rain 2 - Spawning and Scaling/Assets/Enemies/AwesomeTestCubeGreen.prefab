@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5565241911298532452}
   m_Layer: 0
   m_Name: AwesomeTestCubeGreen
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

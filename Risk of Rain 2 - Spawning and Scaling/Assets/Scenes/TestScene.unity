@@ -233,7 +233,7 @@ GameObject:
   - component: {fileID: 329955559}
   m_Layer: 0
   m_Name: SceneDirector
-  m_TagString: Untagged
+  m_TagString: SceneDirector
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -306,6 +306,9 @@ MonoBehaviour:
   vaultDROpened: 0
   enemyWeights: []
   interactableWeights: []
+  combatDirector:
+  - {fileID: 1198668531}
+  - {fileID: 1642992417}
 --- !u!1 &513873594
 GameObject:
   m_ObjectHideFlags: 0
@@ -435,6 +438,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 758975962}
+  - component: {fileID: 758975963}
   m_Layer: 0
   m_Name: Managers
   m_TagString: Untagged
@@ -455,9 +459,41 @@ Transform:
   m_Children:
   - {fileID: 1608152814}
   - {fileID: 329955558}
+  - {fileID: 1198668530}
+  - {fileID: 1642992418}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &758975963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 758975961}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 741ee8e54a5266b4b9489fec9486eb31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneDirector: {fileID: 329955559}
+  difficulityScalingManager: {fileID: 1608152815}
+  combatDirectors:
+  - {fileID: 1198668531}
+  - {fileID: 1642992417}
+  spawnableEnemies:
+  - {fileID: 1874299819606495467, guid: dd2b0b790b76cb142a7dfeb5ec3088d0, type: 3}
+  - {fileID: 5565241911298532452, guid: 91ca9dc3e085b55498b68799d402a257, type: 3}
+  - {fileID: 8765478163262907732, guid: cd1f675421c85e6488d57ccc0f6bbfe9, type: 3}
+  spawnPoints:
+  - {fileID: 916141889}
+  - {fileID: 1324009301}
+  - {fileID: 717470841}
+  - {fileID: 1727215729}
+  - {fileID: 247955327}
+  - {fileID: 985222499}
+  - {fileID: 799691307}
+  - {fileID: 1376482268}
 --- !u!1 &764903471
 GameObject:
   m_ObjectHideFlags: 0
@@ -784,6 +820,63 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+--- !u!1 &1198668529
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1198668530}
+  - component: {fileID: 1198668531}
+  m_Layer: 0
+  m_Name: CombatDirector
+  m_TagString: CombatDirector
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1198668530
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1198668529}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 758975962}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1198668531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1198668529}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85d03b4b52f4d7042b04bc2390073ad7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activeState: 0
+  difficulityScalingManager: {fileID: 1608152815}
+  gameManager: {fileID: 0}
+  enemyCredits: 0
+  enemyCreditsInt: 0
+  creditMultiplier: 1.2
+  creditsPerSecond: 0
+  creditsToOtherDirector: 0
+  combatDirectors: []
+  spawnPoints: []
+  spawnableEnemies: []
+  initialEnemyCount: 0
+  foundValidEnemy: 0
+  enemyWeights: []
 --- !u!1 &1324009300
 GameObject:
   m_ObjectHideFlags: 0
@@ -856,7 +949,7 @@ GameObject:
   - component: {fileID: 1608152815}
   m_Layer: 0
   m_Name: DifficulityManager
-  m_TagString: Untagged
+  m_TagString: DifficulityManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -897,6 +990,63 @@ MonoBehaviour:
   difficulityCoeff: 0
   timeInSeconds: 0
   sceneDirector: {fileID: 329955559}
+--- !u!1 &1642992416
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1642992418}
+  - component: {fileID: 1642992417}
+  m_Layer: 0
+  m_Name: SecondTestDirector
+  m_TagString: CombatDirector
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1642992417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642992416}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85d03b4b52f4d7042b04bc2390073ad7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activeState: 0
+  difficulityScalingManager: {fileID: 1608152815}
+  gameManager: {fileID: 0}
+  enemyCredits: 0
+  enemyCreditsInt: 0
+  creditMultiplier: 1.2
+  creditsPerSecond: 0
+  creditsToOtherDirector: 0
+  combatDirectors: []
+  spawnPoints: []
+  spawnableEnemies: []
+  initialEnemyCount: 0
+  foundValidEnemy: 0
+  enemyWeights: []
+--- !u!4 &1642992418
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1642992416}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 758975962}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1727215728
 GameObject:
   m_ObjectHideFlags: 0

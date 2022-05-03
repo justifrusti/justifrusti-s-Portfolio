@@ -7,7 +7,7 @@ public class SceneDirector : MonoBehaviour
     public enum Map { DistantRoost, TitanicPlains, WetlandAspect, AbandonedAqueduct, RallypointDelta, ScorchedAcres, AbyssalDepths, SirensCall, SkyMeadow, GildedCoast }
     public Map chosenMap;
 
-    public enum DirectorState { SpawningInteractables, SpawningEnemies}
+    public enum DirectorState { SpawningInteractables, SpawningEnemies, ActivatingCombatDirectors}
     public DirectorState directorState;
 
     public DifficulityScalingManager scalingManager;
@@ -29,6 +29,8 @@ public class SceneDirector : MonoBehaviour
 
     [SerializeField]
     private float[] enemyWeights, interactableWeights;
+
+    public List<CombatDirector> combatDirector;
 
     private void Awake()
     {
@@ -55,6 +57,22 @@ public class SceneDirector : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        for (int i = 0; i < originalSpawnableEnemies.Length; i++)
+        {
+            if (!spawnableEnemies.Contains(originalSpawnableEnemies[i]))
+            {
+                spawnableEnemies.Add(originalSpawnableEnemies[i]);
+            }
+        }
+
+        for (int i = 0; i < originalSpawnableInteractables.Length; i++)
+        {
+            if (!spawnableInteractables.Contains(originalSpawnableInteractables[i]))
+            {
+                spawnableInteractables.Add(originalSpawnableInteractables[i]);
+            }
+        }
+
         CalculateStartCredits();
     }
 
@@ -84,6 +102,18 @@ public class SceneDirector : MonoBehaviour
                 else if (initialEnemyCount == 40 || enemyCredit <= 0)
                 {
                     enemyCredit = 0;
+                }
+
+                if(enemyCredit == 0)
+                {
+                    directorState = DirectorState.ActivatingCombatDirectors;
+                }
+                break;
+
+            case DirectorState.ActivatingCombatDirectors:
+                for (int i = 0; i < combatDirector.Count; i++)
+                {
+                    combatDirector[i].enabled = true;
                 }
                 break;
         }
