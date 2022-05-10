@@ -7,13 +7,16 @@ public class CombatDirector : MonoBehaviour
     public enum ActiveState { Activated, Deactivated };
     public ActiveState activeState;
 
+    public enum DirectorType { Slow, Fast}
+    public DirectorType directorType;
+
     [Header("Scripts")]
     public DifficulityScalingManager difficulityScalingManager;
     public GameManager gameManager;
 
     [Header("Credits")]
-    public float enemyCredits = 0;
-    public int enemyCreditsInt;
+    public float monsterCredits = 0;
+    public int monsterCreditsInt;
     public float creditMultiplier;
     public float creditsPerSecond;
 
@@ -22,21 +25,36 @@ public class CombatDirector : MonoBehaviour
     [Header("Combat Directors")]
     public List<CombatDirector> combatDirectors;
 
-    [Header("Enemy Spawning")]
-    public List<Transform> spawnPoints;
+    [Header("Target Spawning")]
+    public List<Transform> players;
+    public Transform targetedPlayer;
 
+    public float minDst, maxDst;
+    public float minTime, maxTime;
+
+    [Header("Enemy Spawning")]
+    //public List<Transform> spawnPoints;
     public List<Enemy> spawnableEnemies;
 
-    public int initialEnemyCount;
+    public float timeTillNextSpawn, retargetTimer;
 
-    public bool foundValidEnemy;
+    public bool foundValidEnemy, firstSpawn;
 
-    Transform sp;
-    Enemy enemyToSpawn;
-    Transform spawnEnemy;
+    public int spawnedMonstersThisWave, maxMonsters;
+    
+    //Remove after Debugging
+    public int creditsNeededDebugInt;
+
+    Enemy monsterToSpawn;
+    Transform spawnMonster;
+    GameObject spawnedMonster;
+
+    Enemy.MonsterTier savedMonsterTier;
 
     [SerializeField]
-    private float[] enemyWeights;
+    private float[] monsterWeights;
+
+    bool triggeredTooManyMonsters = false;
 
     private void Awake()
     {
@@ -47,53 +65,89 @@ public class CombatDirector : MonoBehaviour
             if (!spawnableEnemies.Contains(gameManager.spawnableEnemies[i]))
             {
                 spawnableEnemies.Add(gameManager.spawnableEnemies[i]);
+
+                spawnableEnemies[i].monsterTier = Enemy.MonsterTier.Tier1;
             }
         }
 
-        for (int i = 0; i < gameManager.spawnPoints.Count; i++)
-        {
-            if(!spawnPoints.Contains(gameManager.spawnPoints[i]))
-            {
-                spawnPoints.Add(gameManager.spawnPoints[i]);
-            }
-        }
-
-        enemyWeights = new float[spawnableEnemies.Count];
+        monsterWeights = new float[spawnableEnemies.Count];
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        sp = spawnPoints[Random.Range(0, spawnPoints.Count)];
-        enemyToSpawn = spawnableEnemies[Random.Range(0, spawnableEnemies.Count)];
-        spawnEnemy = enemyToSpawn.transform;
+        maxMonsters = gameManager.ammountOfMonstersAllowed;
+
+        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            players.Add(player.transform);
+        }
+
+        if(directorType == DirectorType.Slow)
+        {
+            minTime = 10;
+            maxTime = 20;
+        }else if(directorType == DirectorType.Fast)
+        {
+            minTime = 0;
+            maxTime = 10;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        GetCredits();
+        if(timeTillNextSpawn > 0 && !foundValidEnemy)
+        {
+            timeTillNextSpawn -= Time.deltaTime;
+        }
 
-        switch(activeState)
+        if(retargetTimer > 0)
+        {
+            retargetTimer -= Time.deltaTime;
+        }else
+        {
+            retargetTimer = Random.Range(minTime, maxTime + 1);
+
+            targetedPlayer = players[Random.Range(0, players.Count)];
+        }
+
+        switch (activeState)
         {
             case ActiveState.Activated:
                 GetCredits();
 
-                if (enemyCreditsInt != 0)
+                if(monsterToSpawn == null)
                 {
                     SpawnWeightedMonster();
                     ResetMonsterSpawnWeights();
                 }
-                else if (enemyCreditsInt <= 0)
+
+                if (monsterCreditsInt > 0 && timeTillNextSpawn <= 0)
                 {
-                    enemyCreditsInt = 0;
+                    SpawnWeightedMonster();
+                    ResetMonsterSpawnWeights();
+
+                    timeTillNextSpawn = Random.Range(minTime, maxTime + 1);
+                }
+                else if (monsterCreditsInt <= 0)
+                {
+                    monsterCreditsInt = 0;
+                }
+
+                if(foundValidEnemy && monsterToSpawn.creditCost <= monsterCreditsInt)
+                {
+                    SpawnMonster();
+                }else if(foundValidEnemy && monsterToSpawn.creditCost > monsterCreditsInt)
+                {
+                    foundValidEnemy = false;
                 }
                 break;
 
             case ActiveState.Deactivated:
                 CombatDirector combatDirector = this.gameObject.GetComponent<CombatDirector>();
 
-                creditsToOtherDirector = (enemyCreditsInt / 10) * 4;
+                creditsToOtherDirector = (monsterCreditsInt / 10) * 4;
 
                 for (int i = 0; i < gameManager.combatDirectors.Count; i++)
                 {
@@ -105,7 +159,7 @@ public class CombatDirector : MonoBehaviour
 
                 CombatDirector directorToGive = combatDirectors[Random.Range(0, combatDirectors.Count)];
 
-                directorToGive.enemyCredits += creditsToOtherDirector;
+                directorToGive.monsterCredits += creditsToOtherDirector;
 
                 combatDirector.enabled = false;
                 break;
@@ -116,49 +170,77 @@ public class CombatDirector : MonoBehaviour
     {
         creditsPerSecond = creditMultiplier * (1 + .4f * difficulityScalingManager.difficulityCoeff) * (difficulityScalingManager.playerCount + 1) / 2;
 
-        enemyCredits += (creditsPerSecond * Time.deltaTime);
+        monsterCredits += (creditsPerSecond * Time.deltaTime);
+        monsterCredits = Mathf.Round(monsterCredits * 1000f) / 1000f;
 
-        enemyCreditsInt = Mathf.RoundToInt(enemyCredits);
+        if(monsterCredits >= 1.000f)
+        {
+            monsterCreditsInt++;
+
+            monsterCredits = 0;
+        }
     }
 
     public void SpawnMonster()
     {
-        //Add check to check how many enemies are alive, if it reaches over 40 wait with enemy spawn unitl it is below 40 again.
+        float spOffset = Random.Range(minDst, maxDst);
+        Vector3 offset = new Vector3(spOffset, 0, spOffset);
 
-        if (initialEnemyCount < 40)
+        if (GameManager.initialEnemyCount < maxMonsters)
         {
+            triggeredTooManyMonsters = false;
+
             if (spawnableEnemies.Count != 0)
             {
                 if (!foundValidEnemy)
                 {
-                    sp = spawnPoints[Random.Range(0, spawnPoints.Count)];
-                    enemyToSpawn = spawnableEnemies[Random.Range(0, spawnableEnemies.Count)];
-                    spawnEnemy = enemyToSpawn.transform;
+                    monsterToSpawn = spawnableEnemies[Random.Range(0, spawnableEnemies.Count)];
+                    spawnMonster = monsterToSpawn.transform;
 
-                    foundValidEnemy = true;
+                    if (monsterToSpawn != null)
+                    {
+                        CheckSpawnCardValid();
+                    }
+
+                    //Remove after Debugging 
+                    creditsNeededDebugInt = monsterToSpawn.creditCost;
                 }
-
-                if (enemyToSpawn.creditCost < enemyCreditsInt && foundValidEnemy)
+                
+                if (monsterToSpawn.creditCost <= monsterCreditsInt && foundValidEnemy)
                 {
-                    Instantiate(spawnEnemy, sp.position, sp.rotation);
+                    if(spawnedMonstersThisWave == 6)
+                    {
+                        foundValidEnemy = false;
 
-                    print("Spawning " + enemyToSpawn);
+                        spawnedMonstersThisWave = 0;
+                    }
 
-                    enemyCreditsInt -= enemyToSpawn.creditCost;
-                    enemyCredits -= enemyToSpawn.creditCost;
+                    Transform spawnedMonsterT = Instantiate(spawnMonster, targetedPlayer.position + offset, targetedPlayer.rotation);
+                    spawnedMonster = spawnedMonsterT.gameObject;
 
-                    initialEnemyCount++;
+                    CalculateMonsterTier();
 
-                    foundValidEnemy = false;
+                    spawnedMonstersThisWave++;
+
+                    GameManager.initialEnemyCount++;
                 }
-                else if (enemyToSpawn.creditCost >= enemyCreditsInt && foundValidEnemy)
+                else if (monsterToSpawn.creditCost >= monsterCreditsInt && foundValidEnemy)
                 {
                     print("Not Enough credit to spawn enemy");
+
+                    foundValidEnemy = false;
+
+                    spawnedMonstersThisWave = 0;
                 }
             }
         }else
         {
-            print("Too Many Enemies");
+            if(!triggeredTooManyMonsters)
+            {
+                print("Too Many Enemies");
+
+                triggeredTooManyMonsters = true;
+            }
         }
     }
 
@@ -166,15 +248,15 @@ public class CombatDirector : MonoBehaviour
     {
         float value = Random.value;
 
-        for (int i = 0; i < enemyWeights.Length; i++)
+        for (int i = 0; i < monsterWeights.Length; i++)
         {
-            if (value < enemyWeights[i])
+            if (value < monsterWeights[i])
             {
                 SpawnMonster();
                 return;
             }
 
-            value -= enemyWeights[i];
+            value -= monsterWeights[i];
         }
     }
 
@@ -184,13 +266,136 @@ public class CombatDirector : MonoBehaviour
 
         for (int i = 0; i < spawnableEnemies.Count; i++)
         {
-            enemyWeights[i] = spawnableEnemies[i].weight;
-            totalEnemyWeight += enemyWeights[i];
+            monsterWeights[i] = spawnableEnemies[i].weight;
+            totalEnemyWeight += monsterWeights[i];
         }
 
-        for (int i = 0; i < enemyWeights.Length; i++)
+        for (int i = 0; i < monsterWeights.Length; i++)
         {
-            enemyWeights[i] = enemyWeights[i] / totalEnemyWeight;
+            monsterWeights[i] = monsterWeights[i] / totalEnemyWeight;
         }
+    }
+
+    private void CalculateMonsterTier()
+    {
+        //First Spawn check breaky??
+        int tier2Cost = monsterToSpawn.creditCost * 6;
+        int tier3Cost = monsterToSpawn.creditCost * 36;
+
+        if (!firstSpawn)
+        {
+            spawnedMonster.GetComponent<Enemy>().monsterTier = savedMonsterTier;
+        }
+
+        if (firstSpawn)
+        {
+            if (difficulityScalingManager.stagesCompleted <= 4)
+            {
+                if (monsterCreditsInt >= tier2Cost)
+                {
+                    spawnedMonster.GetComponent<Enemy>().monsterTier = Enemy.MonsterTier.Tier2;
+                    savedMonsterTier = Enemy.MonsterTier.Tier2;
+                } else
+                {
+                    spawnedMonster.GetComponent<Enemy>().monsterTier = Enemy.MonsterTier.Tier1;
+                    savedMonsterTier = Enemy.MonsterTier.Tier1;
+                }
+            } else if (difficulityScalingManager.stagesCompleted > 4)
+            {
+                if (monsterCreditsInt >= tier3Cost)
+                {
+                    spawnedMonster.GetComponent<Enemy>().monsterTier = Enemy.MonsterTier.Tier3;
+                    savedMonsterTier = Enemy.MonsterTier.Tier3;
+                }
+                else if (monsterCreditsInt >= tier2Cost)
+                {
+                    spawnedMonster.GetComponent<Enemy>().monsterTier = Enemy.MonsterTier.Tier2;
+                    savedMonsterTier = Enemy.MonsterTier.Tier2;
+                }
+                else
+                {
+                    spawnedMonster.GetComponent<Enemy>().monsterTier = Enemy.MonsterTier.Tier1;
+                    savedMonsterTier = Enemy.MonsterTier.Tier1;
+                }
+            }
+
+            firstSpawn = false;
+        }
+
+        switch (monsterToSpawn.monsterTier)
+        {
+            case Enemy.MonsterTier.Tier1:
+                spawnedMonster.GetComponent<Enemy>().creditCost = monsterToSpawn.creditCost * 1;
+                spawnedMonster.GetComponent<Enemy>().monsterHP = monsterToSpawn.monsterHP * 1;
+                spawnedMonster.GetComponent<Enemy>().monsterDMG = monsterToSpawn.monsterDMG * 1;
+                break;
+
+            case Enemy.MonsterTier.Tier2:
+                spawnedMonster.GetComponent<Enemy>().creditCost = monsterToSpawn.creditCost * 6;
+                spawnedMonster.GetComponent<Enemy>().monsterHP = monsterToSpawn.monsterHP * 4;
+                spawnedMonster.GetComponent<Enemy>().monsterDMG = monsterToSpawn.monsterDMG * 2;
+                break;
+
+            case Enemy.MonsterTier.Tier3:
+                spawnedMonster.GetComponent<Enemy>().creditCost = monsterToSpawn.creditCost * 36;
+                spawnedMonster.GetComponent<Enemy>().monsterHP = monsterToSpawn.monsterHP * 18;
+                spawnedMonster.GetComponent<Enemy>().monsterDMG = monsterToSpawn.monsterDMG * 6;
+                break;
+        }
+
+        if(spawnedMonster.GetComponent<Enemy>().creditCost > monsterCreditsInt)
+        {
+            Destroy(spawnedMonster);
+            GameManager.initialEnemyCount--;
+
+            spawnedMonstersThisWave = 0;
+
+            foundValidEnemy = false;
+        }
+
+        monsterCreditsInt -= spawnedMonster.GetComponent<Enemy>().creditCost;
+
+        print("Spawning " + monsterToSpawn + " of " + spawnedMonster.GetComponent<Enemy>().monsterTier);
+    }
+
+    public void CheckSpawnCardValid()
+    {
+        if(spawnedMonstersThisWave != 6)
+        {
+            //Add if statement to check if stage is valid
+
+            IsMonsterTooCheap();
+        }
+    }
+
+    public void IsMonsterTooCheap()
+    {
+        int creditsForTooCheap = ((monsterToSpawn.creditCost * 36) * 6);
+
+        if (creditsForTooCheap > monsterCreditsInt)
+        {
+            foundValidEnemy = true;
+
+            firstSpawn = true;
+        }
+        else if(creditsForTooCheap < monsterCreditsInt)
+        {
+            foundValidEnemy = false;
+        }
+    }
+
+    public void ReassignEnemies()
+    {
+        for (int i = 0; i < gameManager.spawnableEnemies.Count; i++)
+        {
+            if (!spawnableEnemies.Contains(gameManager.spawnableEnemies[i]))
+            {
+                spawnableEnemies.Add(gameManager.spawnableEnemies[i]);
+
+                spawnableEnemies[i].monsterTier = Enemy.MonsterTier.Tier1;
+            }
+        }
+
+        monsterWeights = new float[spawnableEnemies.Count];
     }
 }

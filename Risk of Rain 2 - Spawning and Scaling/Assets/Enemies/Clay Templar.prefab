@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4890316938364086219}
   - component: {fileID: 1874299819606495467}
   m_Layer: 0
-  m_Name: AwesomeTestCube
+  m_Name: Clay Templar
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -108,13 +108,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea490ee881748dd458766bcffceecb8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  directorEnemy: 1
+  monsterTier: 0
+  directorMonster: 0
+  monsterCategory: 1
   scalingManager: {fileID: 0}
-  enemyToSpawn: {fileID: 2828873642908072525}
-  enemyLvl: 0
-  enemyXPReward: 0
-  enemyGoldReward: 0
-  monsterValue: 0
+  monsterToSpawn: {fileID: 2828873642908072525}
+  monsterHP: 700
+  monsterDMG: 16
+  monsterSpeed: 6
+  regenSpeedPerSecond: 0
+  armor: 0
+  monsterLVL: 0
+  monsterXPReward: 0
+  monsterGoldReward: 0
+  monsterValue: 1
   rewardMultiplier: 0
-  weight: 4
-  creditCost: 18
+  weight: 1
+  creditCost: 115

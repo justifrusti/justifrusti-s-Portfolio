@@ -7,10 +7,11 @@ public class SceneDirector : MonoBehaviour
     public enum Map { DistantRoost, TitanicPlains, WetlandAspect, AbandonedAqueduct, RallypointDelta, ScorchedAcres, AbyssalDepths, SirensCall, SkyMeadow, GildedCoast }
     public Map chosenMap;
 
-    public enum DirectorState { SpawningInteractables, SpawningEnemies, ActivatingCombatDirectors}
+    public enum DirectorState { SpawningInteractables, SpawningEnemies, ActivatingCombatDirectors, Finished}
     public DirectorState directorState;
 
     public DifficulityScalingManager scalingManager;
+    public GameManager gameManager;
 
     public List<Enemy> spawnableEnemies;
     public Enemy[] originalSpawnableEnemies;
@@ -52,27 +53,13 @@ public class SceneDirector : MonoBehaviour
 
         enemyWeights = new float[spawnableEnemies.Count];
         interactableWeights = new float[spawnableInteractables.Count];
+
+        gameManager = GameObject.Find("Managers").GetComponent<GameManager>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        for (int i = 0; i < originalSpawnableEnemies.Length; i++)
-        {
-            if (!spawnableEnemies.Contains(originalSpawnableEnemies[i]))
-            {
-                spawnableEnemies.Add(originalSpawnableEnemies[i]);
-            }
-        }
-
-        for (int i = 0; i < originalSpawnableInteractables.Length; i++)
-        {
-            if (!spawnableInteractables.Contains(originalSpawnableInteractables[i]))
-            {
-                spawnableInteractables.Add(originalSpawnableInteractables[i]);
-            }
-        }
-
         CalculateStartCredits();
     }
 
@@ -94,12 +81,12 @@ public class SceneDirector : MonoBehaviour
                 break;
 
             case DirectorState.SpawningEnemies:
-                if (initialEnemyCount != 40 || enemyCredit != 0)
+                if (initialEnemyCount != 40 || enemyCredit != 0 || spawnableEnemies.Count != 0)
                 {
                     SpawnWeightedMonster();
                     ResetMonsterSpawnWeights();
                 }
-                else if (initialEnemyCount == 40 || enemyCredit <= 0)
+                else if (initialEnemyCount == 40 || enemyCredit <= 0 || spawnableEnemies.Count == 0)
                 {
                     enemyCredit = 0;
                 }
@@ -114,7 +101,18 @@ public class SceneDirector : MonoBehaviour
                 for (int i = 0; i < combatDirector.Count; i++)
                 {
                     combatDirector[i].enabled = true;
+
+                    if(i == combatDirector.Count - 1)
+                    {
+                        directorState = DirectorState.Finished;
+                    }
                 }
+                break;
+
+            case DirectorState.Finished:
+                SceneDirector director = this.GetComponent<SceneDirector>();
+
+                director.enabled = false;
                 break;
         }
 
@@ -150,6 +148,7 @@ public class SceneDirector : MonoBehaviour
             enemyCredit -= enemyToSpawn.creditCost;
 
             initialEnemyCount++;
+            GameManager.initialEnemyCount++;
         }else
         {
             enemyCredit = 0;
@@ -221,31 +220,43 @@ public class SceneDirector : MonoBehaviour
                 {
                     interactableCredit += 160;
                 }
+
+                gameManager.mapIndex = 1;
                 break;
 
             case Map.TitanicPlains:
                 interactableCredit = (220 * (1.0f + (.5f * scalingManager.playerCount)));
                 enemyCredit = (100 * (1.0f + (.5f * scalingManager.difficulityCoeff)));
+
+                gameManager.mapIndex = 2;
                 break;
 
             case Map.WetlandAspect:
                 interactableCredit = (280 * (1.0f + (.5f * scalingManager.playerCount)));
                 enemyCredit = (100 * (1.0f + (.5f * scalingManager.difficulityCoeff)));
+
+                gameManager.mapIndex = 3;
                 break;
 
             case Map.AbandonedAqueduct:
                 interactableCredit = (220 * (1.0f + (.5f * scalingManager.playerCount)));
                 enemyCredit = (100 * (1.0f + (.5f * scalingManager.difficulityCoeff)));
+
+                gameManager.mapIndex = 4;
                 break;
 
             case Map.RallypointDelta:
                 interactableCredit = (280 * (1.0f + (.5f * scalingManager.playerCount)));
                 enemyCredit = (100 * (1.0f + (.5f * scalingManager.difficulityCoeff)));
+
+                gameManager.mapIndex = 5;
                 break;
 
             case Map.ScorchedAcres:
                 interactableCredit = (280 * (1.0f + (.5f * scalingManager.playerCount)));
                 enemyCredit = (100 * (1.0f + (.5f * scalingManager.difficulityCoeff)));
+
+                gameManager.mapIndex = 6;
                 break;
 
             case Map.AbyssalDepths:
@@ -256,21 +267,29 @@ public class SceneDirector : MonoBehaviour
                 {
                     interactableCredit += 160;
                 }
+
+                gameManager.mapIndex = 7;
                 break;
 
             case Map.SirensCall:
                 interactableCredit = (400 * (1.0f + (.5f * scalingManager.playerCount)));
                 enemyCredit = (230 * (1.0f + (.5f * scalingManager.difficulityCoeff)));
+
+                gameManager.mapIndex = 8;
                 break;
 
             case Map.SkyMeadow:
                 interactableCredit = (520 * (1.0f + (.5f * scalingManager.playerCount)));
                 enemyCredit = (300 * (1.0f + (.5f * scalingManager.difficulityCoeff)));
+
+                gameManager.mapIndex = 9;
                 break;
 
             case Map.GildedCoast:
                 interactableCredit = (0 * (1.0f + (.5f * scalingManager.playerCount)));
                 enemyCredit = (200 * (1.0f + (.5f * scalingManager.difficulityCoeff)));
+
+                gameManager.mapIndex = 10;
                 break;
         }
 
