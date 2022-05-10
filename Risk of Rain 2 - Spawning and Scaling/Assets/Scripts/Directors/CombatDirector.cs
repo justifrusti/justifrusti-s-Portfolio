@@ -33,7 +33,6 @@ public class CombatDirector : MonoBehaviour
     public float minTime, maxTime;
 
     [Header("Enemy Spawning")]
-    //public List<Transform> spawnPoints;
     public List<Enemy> spawnableEnemies;
 
     public float timeTillNextSpawn, retargetTimer;
@@ -278,7 +277,6 @@ public class CombatDirector : MonoBehaviour
 
     private void CalculateMonsterTier()
     {
-        //First Spawn check breaky??
         int tier2Cost = monsterToSpawn.creditCost * 6;
         int tier3Cost = monsterToSpawn.creditCost * 36;
 

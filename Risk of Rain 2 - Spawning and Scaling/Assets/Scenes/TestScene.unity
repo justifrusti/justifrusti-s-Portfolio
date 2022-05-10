@@ -788,6 +788,7 @@ Transform:
   - {fileID: 329955558}
   - {fileID: 1198668530}
   - {fileID: 1642992418}
+  - {fileID: 1685512081}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1561,8 +1562,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCount: 1
   difficultyValue: 2
-  stagesCompleted: 2000
-  timeInMinutes: 0
+  stagesCompleted: 2
+  timeInMinutes: 15
   playerFactor: 0
   timeFactor: 0
   stageFactor: 0
@@ -1667,6 +1668,64 @@ Transform:
   m_Father: {fileID: 758975962}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1685512080
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1685512081}
+  - component: {fileID: 1685512082}
+  m_Layer: 0
+  m_Name: CombatShrineDirector
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1685512081
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1685512080}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 758975962}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1685512082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1685512080}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41f181b9465892a4dbad12917cde1072, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activeState: 0
+  creditsAmmountInt: 0
+  creditsAmmount: 0
+  rewardsMultiplier: 0.2
+  scalingManager: {fileID: 1608152815}
+  gameManager: {fileID: 0}
+  players: []
+  targetedPlayer: {fileID: 0}
+  minDst: 6
+  maxDst: 20
+  spawnableEnemies: []
+  foundValidEnemy: 0
+  firstSpawn: 0
+  creditsNeededDebugInt: 0
+  monsterWeights: []
 --- !u!1 &1727215728
 GameObject:
   m_ObjectHideFlags: 0
