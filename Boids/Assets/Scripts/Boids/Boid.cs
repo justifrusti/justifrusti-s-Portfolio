@@ -27,11 +27,14 @@ public class Boid : MonoBehaviour {
     // Cached
     Material material;
     Transform cachedTransform;
+    [SerializeField]
     Transform target;
 
     void Awake () {
         material = transform.GetComponentInChildren<MeshRenderer> ().material;
         cachedTransform = transform;
+
+        target = GameObject.Find("Submarine").GetComponent<Transform>();
     }
 
     public void Initialize (BoidSettings settings, Transform target) {
