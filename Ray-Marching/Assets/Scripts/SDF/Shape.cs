@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Shape : MonoBehaviour
 {
-
     public enum ShapeType {Sphere,Cube,Torus};
     public enum Operation {None, Blend, Cut,Mask}
 
