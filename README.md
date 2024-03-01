@@ -1,4 +1,4 @@
-justifrusti's Portfolio
+justifrusti's Portfolio - Explained Scripts over at https://mysticalorbinc.com/portfoliojcs.html
 
 This is my personal portfolio feel free to look around.
 
